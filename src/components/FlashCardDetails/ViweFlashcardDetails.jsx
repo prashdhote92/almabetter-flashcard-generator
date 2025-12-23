@@ -1,17 +1,19 @@
 import React, { use, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { selectFlashcardById } from '../../redux/flashcardSlice'
 import FlashCardDetails from '../../pages/FlashCardDetailsPage'
 import './ViweFlashcardDetails.css'
 import SharePanel from '../SharePanel/SharePanel'
 import { useNavigate } from 'react-router-dom'
 
 const ViweFlashcardDetails = (props) => {
-    const detailStr = localStorage.getItem("flashCardApp")
-    const detailObj = JSON.parse(detailStr)
     const key = props.cardId;
+    const detailObj = useSelector((state) => selectFlashcardById(state, key));
+    
     const [selectedIndx, setSelectedIndx] = useState(0);
-    const groupName = detailObj[key].groupName;
-    const desc = detailObj[key].description;
-    const flashCards = detailObj[key].flashCards;
+    const groupName = detailObj?.groupName;
+    const desc = detailObj?.description;
+    const flashCards = detailObj?.flashCards || [];
     const [shareComponentVisible, setshareComponentVisible] = useState(false)
     const handleShareComponentVisibility = (visibility) => {
         setshareComponentVisible(visibility)
