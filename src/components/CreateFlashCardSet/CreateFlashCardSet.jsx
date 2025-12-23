@@ -7,6 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
 
 function CreateFlashCardSet() {
+import EditFlashCardItem from '../EditFlashCardItem/EditFlashCardItem';
+import { useNavigate } from 'react-router-dom';
+import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik';
+
+function CreateFlashCardSet() {
   const [image, setImage] = useState();
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
@@ -37,6 +42,7 @@ function CreateFlashCardSet() {
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result;
+      setImage(base64);
       setImage(base64);
     };
     reader.readAsDataURL(file);
