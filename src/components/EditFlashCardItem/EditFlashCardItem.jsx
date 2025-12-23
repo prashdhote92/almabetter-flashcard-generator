@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import "./EditFlashCardItem.css";
+import { Field, useFormikContext, ErrorMessage } from 'formik';
 
 function EditFlashCardItem(props) {
-    const [term, setTerm] = useState("")
-    const [description, setDescription] = useState("")
     const fileInputRef = useRef(null);
-    const [image, setImage] = useState();
-
-    useEffect(() => {
-        props.flashcardChanged(props.cardItemIndex - 1, term, description, image)
-    }, [term, description, image])
+    const { values, setFieldValue } = useFormikContext();
+    const flashCard = values.flashCards[props.cardItemIndex];
 
     const onSelectImage = () => {
         fileInputRef.current.click();
     }
+    
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -21,9 +18,13 @@ function EditFlashCardItem(props) {
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = reader.result;
-            setImage(base64); // update preview
+            setFieldValue(`flashCards.${props.cardItemIndex}.image`, base64);
         };
         reader.readAsDataURL(file);
+    };
+
+    const removeImage = () => {
+        setFieldValue(`flashCards.${props.cardItemIndex}.image`, null);
     };
 
     return (
@@ -33,36 +34,51 @@ function EditFlashCardItem(props) {
                     {props.cardItemIndex + 1}
                 </div>
                 <div className='column'>
-                    <label htmlFor='text'  >Enter Term*</label>
-                    <input type="text" onChange={(e) => { setTerm(e.target.value) }} className='TextArea'></input>
+                    <label htmlFor={`flashCards.${props.cardItemIndex}.term`}>Enter Term*</label>
+                    <Field 
+                        name={`flashCards.${props.cardItemIndex}.term`}
+                        type="text" 
+                        className='TextArea'
+                    />
+                    <ErrorMessage 
+                        name={`flashCards.${props.cardItemIndex}.term`} 
+                        component="div" 
+                        style={{ color: 'red', fontSize: '12px', marginTop: '5px' }} 
+                    />
                 </div>
                 <div className='column'>
-                    <label htmlFor='text'>Enter Defination*</label>
-                    <textarea className='TextArea' onChange={(e) => { setDescription(e.target.value) }} />
+                    <label htmlFor={`flashCards.${props.cardItemIndex}.description`}>Enter Definition*</label>
+                    <Field 
+                        as="textarea"
+                        name={`flashCards.${props.cardItemIndex}.description`}
+                        className='TextArea' 
+                    />
+                    <ErrorMessage 
+                        name={`flashCards.${props.cardItemIndex}.description`} 
+                        component="div" 
+                        style={{ color: 'red', fontSize: '12px', marginTop: '5px' }} 
+                    />
                 </div>
                 <div className='column'>
-                    {image &&
-
-                        (<div className='selected_img_container'>
-                            <img className="selected_img" src={image} alt="Uploaded preview" />
+                    {flashCard.image ? (
+                        <div className='selected_img_container'>
+                            <img className="selected_img" src={flashCard.image} alt="Uploaded preview" />
                             <div>
                                 <div className='edit-btn' onClick={onSelectImage}>
                                     <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
-                                    <img src='/edit.png' height={"18px"} />
+                                    <img src='/edit.png' height={"18px"} alt="Edit" />
                                 </div>
-                                <div className='edit-btn' onClick={() => setImage(null)}>
-                                    <img height={"18px"} src='/delete.png' />
+                                <div className='edit-btn' onClick={removeImage}>
+                                    <img height={"18px"} src='/delete.png' alt="Delete" />
                                 </div>
                             </div>
                         </div>
-                        )
-
-                        ||
-                        (<div className='CardImagebtn secondary-btn' onClick={onSelectImage}>
+                    ) : (
+                        <div className='CardImagebtn secondary-btn' onClick={onSelectImage}>
                             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: "none" }} />
                             <span>Select Image</span>
-                        </div>)
-                    }
+                        </div>
+                    )}
                 </div>
             </div>
         </>
